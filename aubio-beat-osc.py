@@ -82,4 +82,4 @@ class BeatDetector:
 if __name__ == "__main__":
     bd = BeatDetector(args.bufsize, client_infos)
 
-    signal.pause()  # Audio processing happens in seperate thread, so put this thread to sleep
+    signal.pause()  # Audio processing happens in separate thread, so put this thread to sleep
