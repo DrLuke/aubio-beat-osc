@@ -19,7 +19,8 @@ class ClientInfo(NamedTuple):
 parser = argparse.ArgumentParser()
 parser.add_argument("-c", "--client", help="OSC Client address (multiple can be provided)", nargs=3, action="append",
                     metavar=("IP", "PORT", "ADDRESS"), required=True)
-parser.add_argument("-b", "--bufsize", help="Size of audio buffer for beat detection (default: 128)", default=128, type=int)
+parser.add_argument("-b", "--bufsize", help="Size of audio buffer for beat detection (default: 128)", default=128,
+                    type=int)
 parser.add_argument("-v", "--verbose", help="Print BPM on beat", action="store_true")
 args = parser.parse_args()
 
@@ -79,7 +80,11 @@ class BeatDetector:
         self.p.terminate()
 
 
-if __name__ == "__main__":
+def main():
     bd = BeatDetector(args.bufsize, client_infos)
 
     signal.pause()  # Audio processing happens in separate thread, so put this thread to sleep
+
+
+if __name__ == "__main__":
+    main()
