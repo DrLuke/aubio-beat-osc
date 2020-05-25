@@ -7,8 +7,8 @@ with open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
 
 setup(
     name="aubio-beat-osc",
-    version="1.0",
-    packages=find_packages(),
+    version="1.1",
+    py_modules=["aubio_beat_osc"],
     install_requires=[
           "wheel",
     ],
