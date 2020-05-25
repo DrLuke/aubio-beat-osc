@@ -1,16 +1,20 @@
 from setuptools import setup, find_packages
 
 from os import path
+
 this_directory = path.abspath(path.dirname(__file__))
 with open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
 
 setup(
     name="aubio-beat-osc",
-    version="1.1",
+    version="1.2",
     py_modules=["aubio_beat_osc"],
     install_requires=[
-          "wheel",
+        "pyaudio",
+        "aubio",
+        "python-osc",
+        "numpy"
     ],
 
     author="Lukas Jackowski",
