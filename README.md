@@ -4,6 +4,12 @@ This is a simple beat detector built with [aubio](https://github.com/aubio/aubio
 It will detect the beat and BPM on the default audio input.
 On every beat, the current BPM is sent to one or more OSC servers.
 
+## Installation
+
+```
+pip install aubio-beat-osc 
+```
+
 ## Usage
 
 ```
