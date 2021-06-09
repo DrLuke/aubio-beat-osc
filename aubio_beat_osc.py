@@ -2,6 +2,8 @@ import pyaudio
 import numpy as np
 import aubio
 import signal
+import os
+import time
 
 import argparse
 
@@ -82,8 +84,13 @@ class BeatDetector:
 
 def main():
     bd = BeatDetector(args.bufsize, client_infos)
-
-    signal.pause()  # Audio processing happens in separate thread, so put this thread to sleep
+    
+    # Audio processing happens in separate thread, so put this thread to sleep
+    if os.name == 'nt': # Windows is not able to pause the main thread :(
+        while True:
+            time.sleep(1)
+    else:
+        signal.pause()
 
 
 if __name__ == "__main__":
