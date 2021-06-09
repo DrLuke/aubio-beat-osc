@@ -81,16 +81,16 @@ class BeatDetector:
         self.stream.close()
         self.p.terminate()
 
-def pause() -> None:
-    if os.name == 'nt': # Windows is not able to pause the main thread :(
-        while True:
-            time.sleep(1)
-    signal.pause()
 
 def main():
     bd = BeatDetector(args.bufsize, client_infos)
-
-    pause()  # Audio processing happens in separate thread, so put this thread to sleep
+    
+    # Audio processing happens in separate thread, so put this thread to sleep
+    if os.name == 'nt': # Windows is not able to pause the main thread :(
+        while True:
+            time.sleep(1)
+    else:
+        signal.pause()
 
 
 if __name__ == "__main__":
