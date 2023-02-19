@@ -19,15 +19,20 @@ class ClientInfo(NamedTuple):
 
 
 parser = argparse.ArgumentParser()
-parser.add_argument("-c", "--client", help="OSC Client address (multiple can be provided)", nargs=3, action="append",
-                    metavar=("IP", "PORT", "ADDRESS"), required=True)
-parser.add_argument("-b", "--bufsize", help="Size of audio buffer for beat detection (default: 128)", default=128,
-                    type=int)
-parser.add_argument("-v", "--verbose", help="Print BPM on beat", action="store_true")
-args = parser.parse_args()
+sp = parser.add_subparsers(dest="command")
 
-# Pack data from arguments into ClientInfo objects
-client_infos: List[ClientInfo] = [ClientInfo(x[0], int(x[1]), x[2]) for x in args.client]
+beat_parser = sp.add_parser("beat", help="Start beat detection")
+beat_parser.add_argument("-c", "--client", help="OSC Client address (multiple can be provided)", nargs=3,
+                         action="append",
+                         metavar=("IP", "PORT", "ADDRESS"), required=True)
+beat_parser.add_argument("-b", "--bufsize", help="Size of audio buffer for beat detection (default: 128)", default=128,
+                         type=int)
+beat_parser.add_argument("-v", "--verbose", help="Print BPM on beat", action="store_true")
+beat_parser.add_argument("-d", "--device", help="Input device index (use list command to see available devices)",
+                         default=None, type=int)
+
+list_parser = sp.add_parser("list", help="Print a list of all available audio devices")
+args = parser.parse_args()
 
 
 class BeatPrinter:
@@ -54,7 +59,8 @@ class BeatDetector:
             rate=samplerate,
             input=True,
             frames_per_buffer=self.buf_size,
-            stream_callback=self._pyaudio_callback
+            stream_callback=self._pyaudio_callback,
+            input_device_index=args.device
         )
 
         fft_size: int = self.buf_size * 2
@@ -82,15 +88,33 @@ class BeatDetector:
         self.p.terminate()
 
 
+def list_devices():
+    p = pyaudio.PyAudio()
+    info = p.get_host_api_info_by_index(0)
+    numdevices = info.get('deviceCount')
+
+    for i in range(0, numdevices):
+        if (p.get_device_info_by_host_api_device_index(0, i).get('maxInputChannels')) > 0:
+            print("Input Device id ", i, " - ", p.get_device_info_by_host_api_device_index(0, i).get('name'))
+
+
 def main():
-    bd = BeatDetector(args.bufsize, client_infos)
-    
-    # Audio processing happens in separate thread, so put this thread to sleep
-    if os.name == 'nt': # Windows is not able to pause the main thread :(
-        while True:
-            time.sleep(1)
-    else:
-        signal.pause()
+    if args.command == "list":
+        list_devices()
+        return
+
+    if args.command == "beat":
+        # Pack data from arguments into ClientInfo objects
+        client_infos: List[ClientInfo] = [ClientInfo(x[0], int(x[1]), x[2]) for x in args.client]
+
+        bd = BeatDetector(args.bufsize, client_infos)
+
+        # Audio processing happens in separate thread, so put this thread to sleep
+        if os.name == 'nt':  # Windows is not able to pause the main thread :(
+            while True:
+                time.sleep(1)
+        else:
+            signal.pause()
 
 
 if __name__ == "__main__":
