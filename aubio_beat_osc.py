@@ -89,13 +89,16 @@ class BeatDetector:
 
 
 def list_devices():
+    print("Listing all available input devices:\n")
     p = pyaudio.PyAudio()
     info = p.get_host_api_info_by_index(0)
     numdevices = info.get('deviceCount')
 
     for i in range(0, numdevices):
         if (p.get_device_info_by_host_api_device_index(0, i).get('maxInputChannels')) > 0:
-            print("Input Device id ", i, " - ", p.get_device_info_by_host_api_device_index(0, i).get('name'))
+            print(f"[{i}] {p.get_device_info_by_host_api_device_index(0, i).get('name')}")
+
+    print("\nUse the number in the square brackets as device index")
 
 
 def main():
